@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Dash - Numerasi SMP</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f2f5; }
+        #game-container { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 350px; }
+        .question { font-size: 2rem; font-weight: bold; margin-bottom: 1rem; color: #333; }
+        input { width: 80%; padding: 10px; font-size: 1.2rem; margin-bottom: 1rem; border: 2px solid #ddd; border-radius: 8px; text-align: center; }
+        button { background: #4CAF50; color: white; border: none; padding: 10px 20px; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #45a049; }
+        .stats { display: flex; justify-content: space-between; margin-top: 1.5rem; font-weight: bold; color: #666; }
+        #feedback { margin-top: 10px; height: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h2>Math Dash ⚡</h2>
+    <div class="stats">
+        <span>Skor: <span id="score">0</span></span>
+        <span>Waktu: <span id="timer">30</span>s</span>
+    </div>
+    <hr>
+    <div id="game-area">
+        <div class="question" id="question">Siap?</div>
+        <input type="number" id="answer" placeholder="Jawaban..." autofocus>
+        <br>
+        <button onclick="checkAnswer()" id="submit-btn">Kirim Jawaban</button>
+    </div>
+    <div id="feedback"></div>
+    <button onclick="startGame()" id="start-btn" style="margin-top: 10px;">Mulai Game</button>
+</div>
+
+<script>
+    let score = 0;
+let timeLeft = 30;
+let correctAnswer;
+let timerInterval;
+
+const questionEl = document.getElementById('question');
+const answerInput = document.getElementById('answer');
+const scoreEl = document.getElementById('score');
+const timerEl = document.getElementById('timer');
+const feedbackEl = document.getElementById('feedback');
+const startBtn = document.getElementById('start-btn');
+
+function generateQuestion() {
+    const operators = ['+', '-', '*'];
+    const op = operators[Math.floor(Math.random() * operators.length)];
+    let a = Math.floor(Math.random() * 20) + 1;
+    let b = Math.floor(Math.random() * 15) + 1;
+
+    if (op === '+') correctAnswer = a + b;
+    if (op === '-') { 
+        if (a < b) [a, b] = [b, a]; // Pastikan hasil positif untuk level dasar
+        correctAnswer = a - b;
+    }
+    if (op === '*') correctAnswer = a * b;
+
+    questionEl.innerText = `${a} ${op} ${b} = ?`;
+    answerInput.value = '';
+}
+
+function checkAnswer() {
+    const userAnswer = parseInt(answerInput.value);
+    if (userAnswer === correctAnswer) {
+        score += 10;
+        scoreEl.innerText = score;
+        feedbackEl.innerText = "Benar! 🎉";
+        feedbackEl.style.color = "green";
+    } else {
+        feedbackEl.innerText = "Salah! ❌";
+        feedbackEl.style.color = "red";
+    }
+    generateQuestion();
+    answerInput.focus();
+}
+
+function startGame() {
+    score = 0;
+    timeLeft = 30;
+    scoreEl.innerText = score;
+    timerEl.innerText = timeLeft;
+    startBtn.style.display = 'none';
+    answerInput.disabled = false;
+    feedbackEl.innerText = "";
+    
+    generateQuestion();
+    
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        timerEl.innerText = timeLeft;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            endGame();
+        }
+    }, 1000);
+}
+
+function endGame() {
+    questionEl.innerText = "Waktu Habis!";
+    answerInput.disabled = true;
+    startBtn.style.display = 'inline-block';
+    startBtn.innerText = "Main Lagi";
+    alert(`Game Selesai! Skor akhir kamu: ${score}`);
+}
+
+// Support tombol 'Enter' untuk kirim jawaban
+answerInput.addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        checkAnswer();
+    }
+});
+</script>
+
+</body>
+</html>
